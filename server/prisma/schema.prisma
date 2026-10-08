@@ -1,0 +1,135 @@
+// CareerCraft Database Schema
+// Datasource: SQLite for local zero-config development
+// Generator: Prisma Client for type-safe database queries
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  username     String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  profile      Profile?
+}
+
+model Profile {
+  id              String           @id @default(uuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String           @default("")
+  headline        String           @default("")
+  summary         String           @default("")
+  email           String           @default("")
+  phone           String           @default("")
+  location        String           @default("")
+  websiteUrl      String           @default("")
+  githubUrl       String           @default("")
+  linkedinUrl     String           @default("")
+  avatarUrl       String           @default("")
+  education       Education[]
+  experience      Experience[]
+  projects        Project[]
+  skills          Skill[]
+  certifications  Certification[]
+  resumeConfig    ResumeConfig?
+  portfolioConfig PortfolioConfig?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model Education {
+  id           String   @id @default(uuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  institution  String
+  degree       String
+  fieldOfStudy String
+  startDate    String
+  endDate      String
+  isCurrent    Boolean  @default(false)
+  gpa          String   @default("")
+  description  String   @default("")
+  orderIndex   Int      @default(0)
+}
+
+model Experience {
+  id          String   @id @default(uuid())
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  company     String
+  role        String
+  location    String   @default("")
+  startDate   String
+  endDate     String
+  isCurrent   Boolean  @default(false)
+  description String   @default("")
+  orderIndex  Int      @default(0)
+}
+
+model Project {
+  id           String   @id @default(uuid())
+  profileId    String
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  technologies String   @default("")
+  liveUrl      String   @default("")
+  githubUrl    String   @default("")
+  isFeatured   Boolean  @default(false)
+  orderIndex   Int      @default(0)
+}
+
+model Skill {
+  id         String   @id @default(uuid())
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name       String
+  category   String   @default("Technical")
+  level      String   @default("Intermediate")
+  orderIndex Int      @default(0)
+}
+
+model Certification {
+  id            String   @id @default(uuid())
+  profileId     String
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title         String
+  issuer        String
+  issueDate     String
+  expiryDate    String   @default("")
+  credentialUrl String   @default("")
+  credentialId  String   @default("")
+  orderIndex    Int      @default(0)
+}
+
+model ResumeConfig {
+  id           String   @id @default(uuid())
+  profileId    String   @unique
+  profile      Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  templateId   String   @default("modern-ats")
+  primaryColor String   @default("#2563eb")
+  fontFamily   String   @default("Inter")
+  fontSize     String   @default("medium")
+  showPhoto    Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+}
+
+model PortfolioConfig {
+  id               String   @id @default(uuid())
+  profileId        String   @unique
+  profile          Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  themeId          String   @default("modern-dev")
+  isPublished      Boolean  @default(true)
+  primaryColor     String   @default("#6366f1")
+  showContactEmail Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
